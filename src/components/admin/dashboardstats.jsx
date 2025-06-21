@@ -1,21 +1,33 @@
 import React from 'react';
-
+import ordersImg from '../../assets/images/total_order.jpg';
+import revenueImg from '../../assets/images/total_revenue.jpg';
+import servedImg from '../../assets/images/served.jpg';
+import pendingImg from '../../assets/images/pending.jpg';
 const stats = [
-  { title: "Total Orders Today", value: 127, note: "+12% from yesterday" },
-  { title: "Revenue Today", value: "Rs4000", note: "+8.2% from yesterday" },
-  { title: "Total Orders Served", value: "500", note: "-2.1% from yesterday" },
-  { title: "Pending Orders", value: 8, note: "Requires attention" },
+  { title: "Total Orders Today", value: 127, bgImage: ordersImg },
+  { title: "Revenue Today", value: "Rs4000", bgImage: revenueImg },
+  { title: "Total Orders Served", value: "500", bgImage: servedImg },
+  { title: "Pending Orders", value: 8, bgImage: pendingImg },
 ];
 
 const DashboardStats = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     {stats.map((item, idx) => (
-      <div key={idx} className="bg-white p-4 rounded shadow">
-        <h3 className="text-sm text-gray-500">{item.title}</h3>
-        <p className="text-2xl font-bold">{item.value}</p>
-        <p className={`text-sm ${item.note.includes('+') ? 'text-green-500' : 'text-red-500'}`}>
-          {item.note}
-        </p>
+      <div
+        key={idx}
+        className="relative p-4 rounded shadow text-white h-40 flex flex-col justify-end"
+        style={{
+          backgroundImage: `url(${item.bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Overlay for better text visibility */}
+        <div className="absolute inset-0 bg-black bg-opacity-40 rounded"></div>
+
+        {/* Content */}
+        <h3 className="relative text-sm font-semibold">{item.title}</h3>
+        <p className="relative text-2xl font-bold">{item.value}</p>
       </div>
     ))}
   </div>

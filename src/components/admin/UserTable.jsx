@@ -117,7 +117,7 @@ export default function UserTable() {
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Users</h2>
                 <Link to="/admin/user/create">
-                    <button className="bg-[#A62123] text-white px-4 py-2 rounded-md hover:bg-red-700 transition">
+                    <button className="bg-[#A62123] text-white px-4 py-2 rounded-md hover:bg-red-500 transition">
                         Add User
                     </button>
                 </Link>
@@ -129,30 +129,30 @@ export default function UserTable() {
             {users.length === 0 ? (
                 <p className="text-center text-gray-500">No users found.</p>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
                     {users.map((user) => (
-                        <div key={user._id} className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
+                        <div key={user._id} className="bg-gray-500 p-5 rounded-xl shadow hover:shadow-lg transition">
                             <div className="mb-2">
-                                <h3 className="text-lg font-semibold text-black">{user.username}</h3>
-                                <p className="text-sm font-medium text-gray-700">{user.email}</p>
+                                <h3 className="text-lg font-semibold text-white">{user.username}</h3>
+                                <p className="text-sm font-medium text-white">{user.email}</p>
                                 <p className="text-sm text-gray-500">Role: {user.role}</p>
                             </div>
                             <div className="flex justify-between mt-4 text-sm">
                                 <Link
                                     to={`/admin/user/${user._id}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="bg-white text-blue-600 px-3 py-1 rounded-md text-center font-medium hover:bg-blue-50 transition hover:scale-105 transform transition-transform duration-200"
                                 >
                                     View
                                 </Link>
                                 <Link
                                     to={`/admin/user/${user._id}/edit`}
-                                    className="text-green-600 hover:underline"
+                                    className="bg-white text-green-600 px-3 py-1 rounded-md font-medium hover:bg-green-50 transition hover:scale-105 transform transition-transform duration-200"
                                 >
                                     Edit
                                 </Link>
                                 <button
                                     onClick={() => setDeleteId(user._id)}
-                                    className="text-red-600 hover:underline"
+                                    className="text-red-600 hover:scale-105 transform transition-transform duration-200 "
                                     disabled={deleteUserMutation.isLoading}
                                 >
                                     {deleteUserMutation.isLoading && deleteId === user._id

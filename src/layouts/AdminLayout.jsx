@@ -158,7 +158,7 @@ const SidebarItem = ({ icon, label, to = "#", active }) => (
             `}
         >
             <span>{icon}</span>
-            <span className="font-normal">{label}</span>
+            <span className="font-bold">{label}</span>
         </div>
     </Link>
 );

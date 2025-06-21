@@ -4,9 +4,15 @@ import { useNavigate } from "react-router-dom"
 import { AuthContext } from "../auth/AuthProvider"
 import { Search, User, ChevronDown } from "lucide-react"
 
+function Welcome(props) {
+  return <>{props.name}</>;
+}
+
 export default function Header() {
-  const { logout } = useContext(AuthContext)  // <-- get logout from context
+  const { logout, user } = useContext(AuthContext)  // <-- get logout from context
   const navigate = useNavigate()
+
+  if (!user) return null;
 
   const handleLogout = () => {
     logout()            // clears session/token/user info
@@ -20,9 +26,9 @@ export default function Header() {
         {/* Left - Logo */}
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
-            <span className="text-[#A62123] font-bold text-sm">K</span>
+            <span className="text-[#A62123] font-bold text-sm">S</span>
           </div>
-          <span className="font-semibold text-lg text-white">KioskPro</span>
+          <span className="font-semibold text-lg text-white">Servzz Pro</span>
         </div>
 
         {/* Center - Search */}
@@ -42,11 +48,11 @@ export default function Header() {
           {/* Avatar */}
           <div className="flex items-center gap-2 px-2 hover:bg-[#911c1e] rounded-md transition-colors">
             <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-[#A62123] font-bold">
-              AD
+              {user.username ? user.username.charAt(0).toUpperCase() : "?"}
             </div>
             <div className="hidden md:flex flex-col items-start">
-              <span className="text-sm font-medium">Admin</span>
-              <span className="text-xs text-white/70">Administrator</span>
+              <span className="text-sm font-medium">{user.username || "User"}</span>
+              <span className="text-xs text-white/70">{user.role || "Role"}</span>
             </div>
             <ChevronDown className="h-4 w-4" />
           </div>
@@ -57,9 +63,7 @@ export default function Header() {
             <div className="px-4 py-2 hover:bg-gray-100 flex items-center gap-2 cursor-pointer">
               <User className="h-4 w-4" /> Profile
             </div>
-            <div className="px-4 py-2 hover:bg-gray-100 flex items-center gap-2 cursor-pointer">
-              <User className="h-4 w-4" /> Settings
-            </div>
+
             <div className="border-t">
               <div
                 onClick={handleLogout}
@@ -69,7 +73,7 @@ export default function Header() {
 
           {/* Badge */}
           <span className="hidden sm:flex px-2 py-1 rounded-full bg-white text-[#A62123] text-xs font-semibold">
-            Admin Panel
+            <Welcome name={user.username} />
           </span>
         </div>
       </div>
