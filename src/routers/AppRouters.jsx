@@ -13,6 +13,9 @@ import GuestRoute from './GuestRoute'
 import NormalUserRoute from './NormalUserRoute'
 import ViewCategory from '../pages/admin/ViewCategory'
 import CreateCategory from '../pages/admin/CreateCategory'
+import UserManagement from '../pages/admin/UserManagement'
+import CreateUserForm from '../pages/admin/CreateUser'
+import UpdateUserForm from '../components/admin/UpdateUserForm'
 function App() {
     return (
 
@@ -44,6 +47,9 @@ function App() {
                     <Route path="products" element={<ProductManagement />} />
                     <Route path="category" element={<CategoryManagement />} />
                     <Route path="category/:id/edit" element={<UpdateCategory />} />
+                    <Route path="user" element={<UserManagement />} />
+                    <Route path="user/create" element={<CreateUserForm />} />
+                    <Route path="user/:id/edit" element={<UpdateUserForm />} />
                     <Route path='category/create' element={<CreateCategory />}></Route>
 
                 </Route>

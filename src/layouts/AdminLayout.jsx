@@ -104,9 +104,9 @@ export default function AdminLayout() {
                         />
                         <SidebarItem
                             icon={<FaClipboardList />}
-                            label="Orders"
-                            to="/admin/orders"
-                            active={isActive("/admin/orders")}
+                            label="Users"
+                            to="/admin/user"
+                            active={isActive("/admin/user")}
                         />
                         <SidebarItem
                             icon={<FaCog />}
@@ -135,8 +135,13 @@ export default function AdminLayout() {
                 </main>
             </div>
 
-            <footer className="text-center text-sm text-gray-500 py-4">
-                2025 © My App
+            <footer className="bg-[#A62123] text-white py-6">
+                <div className="container mx-auto px-4 text-center">
+                    <h2 className="text-lg font-semibold tracking-wide mb-2">Servzz</h2>
+                    <p className="text-sm opacity-90">
+                        © {new Date().getFullYear()} Servzz. All rights reserved. Unauthorized use or duplication is prohibited.
+                    </p>
+                </div>
             </footer>
         </div>
     );
@@ -144,10 +149,13 @@ export default function AdminLayout() {
 
 // SidebarItem component (inside the same file or import if extracted)
 const SidebarItem = ({ icon, label, to = "#", active }) => (
-    <Link to={to} className="block">
+    <Link to={to} className="block rounded md">
         <div
-            className={`flex items-center space-x-2 cursor-pointer ${active ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600"
-                }`}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all
+                ${active
+                    ? "bg-[#A62123] text-white font-semibold"
+                    : "text-gray-700 hover:text-[#A62123] hover:bg-gray-100"}
+            `}
         >
             <span>{icon}</span>
             <span className="font-normal">{label}</span>
