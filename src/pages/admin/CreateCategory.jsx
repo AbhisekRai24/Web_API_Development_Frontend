@@ -68,7 +68,7 @@ export default function CreateCategory() {
                     )}
                 </div>
 
-                {/* {formik.values.image && (
+                {formik.values.image && (
                     <div className="mt-6 text-center">
                         <p className="text-gray-700 font-semibold mb-3">Image Preview:</p>
                         <div className="inline-block border border-gray-300 shadow-md rounded-xl overflow-hidden transition-transform duration-300 hover:scale-105">
@@ -80,7 +80,7 @@ export default function CreateCategory() {
                         </div>
                         <p className="text-sm text-gray-500 mt-2">{formik.values.image.name}</p>
                     </div>
-                )} */}
+                )}
                 <button
                     type="submit"
                     disabled={isPending}
