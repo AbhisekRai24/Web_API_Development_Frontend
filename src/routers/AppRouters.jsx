@@ -26,11 +26,12 @@ function App() {
 
 
                 <Route path='/normal/*' element={<NormalUserRoute />}>
-                    <Route path="" element={<Home />} />
+
                     <Route path='*' element={<>404 Not Found</>} ></Route>
                 </Route>
 
                 <Route element={<MainLayout />}>
+                    <Route path="" element={<Home />} />
 
 
                 </Route>
@@ -39,7 +40,7 @@ function App() {
                 <Route path="/admin/*" element={<AdminLayout />}>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="addproduct" element={<AddProducts />} />
-                    <Route path='category/:id' element={<ViewCategory/>}></Route>
+                    <Route path='category/:id' element={<ViewCategory />}></Route>
                     <Route path="products" element={<ProductManagement />} />
                     <Route path="category" element={<CategoryManagement />} />
                     <Route path="category/:id/edit" element={<UpdateCategory />} />

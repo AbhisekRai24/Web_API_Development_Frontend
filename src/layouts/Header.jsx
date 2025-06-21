@@ -1,8 +1,18 @@
 "use client"
-
+import { useContext } from "react"
+import { useNavigate } from "react-router-dom"
+import { AuthContext } from "../auth/AuthProvider"
 import { Search, User, ChevronDown } from "lucide-react"
 
 export default function Header() {
+  const { logout } = useContext(AuthContext)  // <-- get logout from context
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()            // clears session/token/user info
+    navigate("/login")  // sends user to login page
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-[#A62123] text-white">
       <div className="flex h-16 items-center justify-between px-4">
@@ -51,7 +61,9 @@ export default function Header() {
               <User className="h-4 w-4" /> Settings
             </div>
             <div className="border-t">
-              <div className="px-4 py-2 text-red-600 hover:bg-red-50 cursor-pointer">Log out</div>
+              <div
+                onClick={handleLogout}
+                className="px-4 py-2 text-red-600 hover:bg-red-50 cursor-pointer">Log out</div>
             </div>
           </div>
 
