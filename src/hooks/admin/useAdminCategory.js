@@ -15,6 +15,7 @@ export const useAdminCategory = () => {
         ...query, categories
     }
 }
+
 export const useCreateCategory = () => {
     const queryClient = useQueryClient()
     return useMutation({
@@ -32,19 +33,16 @@ export const useCreateCategory = () => {
 }
 
 export const useGetOneCategory = (id) => {
-    const query = useQuery(
-        {
-            queryKey: ["admin_category_detail"],
-            queryFn: () => getOneCategoryService(id),
-            enabled: !!id,
-            retry: false //default 3 retires
-        }
-    )
-    const category = query.data?.data || {}
-    return {
-        ...query, category
-    }
-}
+    const query = useQuery({
+        queryKey: ["admin_category_detail", id],  // add id here!
+        queryFn: () => getOneCategoryService(id),
+        enabled: !!id,
+        retry: false
+    });
+    const category = query.data?.data || {};
+    return { ...query, category };
+};
+
 
 
 export const useUpdateOneCategory = () => {

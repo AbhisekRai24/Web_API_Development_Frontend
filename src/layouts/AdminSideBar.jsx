@@ -71,7 +71,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../auth/AuthProvider";
 import { useContext } from "react";
-import Header from './Header'
+import Header from './AdminHeader'
 import { ChevronDown } from "lucide-react";
 import {
     FaHome,

@@ -1,10 +1,12 @@
+import { useContext } from "react"; // ✅ Required import
+import { AuthContext } from '../auth/AuthProvider';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import MainLayout from '../layouts/MainLayout'
+import MainLayout from '../layouts/AdminMainLayout'
 import Login from '../pages/login_page'
 import Home from '../pages/home_page'
 import Register from '../pages/register_page'
 import Dashboard from '../pages/admin/Dashboard'
-import AdminLayout from '../layouts/AdminLayout'
+import AdminLayout from '../layouts/AdminSideBar'
 import AddProducts from '../pages/admin/AddProduct'
 import CategoryManagement from '../pages/admin/CategoryManagement'
 import ProductManagement from '../pages/admin/ProductManagement'
@@ -16,11 +18,21 @@ import CreateCategory from '../pages/admin/CreateCategory'
 import UserManagement from '../pages/admin/UserManagement'
 import CreateUserForm from '../pages/admin/CreateUser'
 import UpdateUserForm from '../components/admin/UpdateUserForm'
+import Page from "../components/user_dashbard"
+import MyOrders from "../pages/MyOrders"
+import UserMainLayout from "../layouts/UserMainLayout"
+import CategoryProducts from "../components/CategoryProduct";
+
 function App() {
+    const { loading } = useContext(AuthContext);
+
+    if (loading) return <>Loading App...</>;
     return (
 
         <Router>
+
             <Routes>
+                <Route path="/" element={<Home />}></Route>
                 <Route element={<GuestRoute />}>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
@@ -28,16 +40,32 @@ function App() {
 
 
 
-                <Route path='/normal/*' element={<NormalUserRoute />}>
+                {/* <Route path='/normal/*' element={<NormalUserRoute />}>
 
                     <Route path='*' element={<>404 Not Found</>} ></Route>
+                    
                 </Route>
 
                 <Route element={<MainLayout />}>
                     <Route path="" element={<Home />} />
+                    <Route path="/dash" element={<Page />} />
 
 
-                </Route>
+                </Route> */}
+
+                {/* Normal user routes protected by NormalUserRoute */}
+                <Route path='/normal/*' element={<NormalUserRoute />}>
+
+                    <Route element={<UserMainLayout />}>
+
+                        <Route path="dash" element={<Page />} />
+                        <Route path="myorders" element={<MyOrders />} />
+                        <Route path="user/category/:categoryId" element={<CategoryProducts />} />
+             </Route>
+                    {/* Catch all 404 for /normal */}
+                    <Route path="*" element={<>404 Not Found</>} />
+                      </Route>
+              
 
                 {/* Admin routes under AdminLayout */}
                 <Route path="/admin/*" element={<AdminLayout />}>

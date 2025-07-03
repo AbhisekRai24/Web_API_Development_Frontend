@@ -1,12 +1,34 @@
-import React from 'react'
-import { useAdminProduct } from '../../hooks/admin/useAdminProduct'
+import React, { useState } from 'react'
+import { useAdminProduct, useDeleteProduct } from '../../hooks/admin/useAdminProduct'
+import DeleteModal from '../DeleteModal';
+
+
+
 
 export default function ProductTable() {
     const { data, error, isPending, products, pageNumber,
         setPageNumber, pagination, canNextPage, canPreviousPage,
         pageSize, setPageSize, search, setSearch } = useAdminProduct()
+    const { mutate: deleteProduct, isLoading: isDeleting } = useDeleteProduct();
+    const [selectedProduct, setSelectedProduct] = useState(null); // product to delete
+    const [showModal, setShowModal] = useState(false); // modal visibility
 
     if (error) return <div className="text-red-600 font-semibold">{error.message}</div>
+
+
+
+    const handleDeleteClick = (product) => {
+        setSelectedProduct(product);
+        setShowModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (selectedProduct) {
+            deleteProduct(selectedProduct._id);
+        }
+        setShowModal(false);
+        setSelectedProduct(null);
+    };
 
     const handlePrev = () => {
         if (canPreviousPage) {
@@ -73,6 +95,7 @@ export default function ProductTable() {
                             <th className="text-left px-6 py-3 font-semibold text-gray-700 border-b border-gray-300">
                                 Price
                             </th>
+                            <th className="text-left px-6 py-3 font-semibold text-gray-700 border-b border-gray-300">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,10 +106,27 @@ export default function ProductTable() {
                             >
                                 <td className="px-6 py-4 border-b border-gray-200">{row.name}</td>
                                 <td className="px-6 py-4 border-b border-gray-200">Rs.{row.price.toFixed(2)}</td>
+                                <td className="px-6 py-4 border-b border-gray-200">
+                                    <button
+                                        onClick={() => handleDeleteClick(row)}
+                                        className="bg-gray-400 text-red-800 px-3 py-1 rounded hover:bg-red-500 hover:text-white transition"
+
+                                        disabled={isDeleting}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                <DeleteModal
+    isOpen={showModal}
+    onClose={() => setShowModal(false)}
+    onConfirm={confirmDelete}
+    title="Delete Product"
+    description={`Are you sure you want to delete "${selectedProduct?.name}"?`}
+/>
             </div>
             {/* Pagination Controls */}
             <div className="mt-6 flex justify-between items-center">

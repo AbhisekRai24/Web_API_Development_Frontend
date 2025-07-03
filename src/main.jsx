@@ -17,7 +17,7 @@ createRoot(document.getElementById('root')).render(
         <ToastContainer
           position='top-center'
           autoClose={2000}
-          hideProgressBar={false}
+          // hideProgressBar={false}
           theme='dark'
           transition={Zoom} // Effects :- Bouce, Slide, Zoom, Flip
         />
