@@ -3,6 +3,7 @@ import { useContext } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { AuthContext } from "../auth/AuthProvider"
 import { User, ChevronDown } from "lucide-react"
+import { getBackendImageUrl } from "../utils/backend-image"; // adjust path accordingly
 
 function Welcome(props) {
   return <>{props.name}</>;
@@ -21,7 +22,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-[#A62123] text-white">
-      <div className="flex h-16 items-center justify-between px-6">
+      <div className="flex h-20 items-center justify-between px-6">
 
         {/* Left - Logo */}
         <div className="flex items-center gap-2">
@@ -52,8 +53,20 @@ export default function Header() {
           {/* Profile Dropdown */}
           <div className="flex items-center gap-4 relative group cursor-pointer">
             <div className="flex items-center gap-2 px-2 hover:bg-[#911c1e] rounded-md transition-colors">
-              <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-[#A62123] font-bold">
-                {user.username ? user.username.charAt(0).toUpperCase() : "?"}
+              <div className="h-8 w-8 rounded-full overflow-hidden bg-white flex items-center justify-center text-[#A62123] font-bold">
+                {user.profileImage ? (
+                  <img
+                    src={getBackendImageUrl(user.profileImage)}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null; // prevents infinite loop
+                      e.currentTarget.src = "/default-profile.png"; // fallback image path
+                    }}
+                  />
+                ) : (
+                  user.username ? user.username.charAt(0).toUpperCase() : "?"
+                )}
               </div>
               <div className="hidden md:flex flex-col items-start">
                 <span className="text-sm font-medium">{user.username || "User"}</span>
