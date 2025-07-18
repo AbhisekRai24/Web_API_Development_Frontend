@@ -7,6 +7,7 @@ import { MdRemoveShoppingCart } from "react-icons/md";
 import MyOrderCard from "../components/MyOrderCard";
 import DeleteModal from "../components/DeleteModal";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion"
 
 // Helper: Group orders by formatted date
 const groupOrdersByDate = (orders) => {
@@ -91,7 +92,7 @@ export default function MyOrders() {
   const groupedOrders = groupOrdersByDate(orders);
 
   return (
-    <div className="p-10 max-w-5xl mx-auto">
+    <div className="p-10 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">My Orders</h1>
 
       {Object.entries(groupedOrders).map(([date, ordersOnDate]) => (
@@ -99,9 +100,16 @@ export default function MyOrders() {
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
             {date}
           </h2>
-          <div className="space-y-6">
-            {ordersOnDate.map((order) => (
-              <MyOrderCard key={order._id} order={order} onDelete={openDeleteModal} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {ordersOnDate.map((order, index) => (
+              <motion.div
+                key={order._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <MyOrderCard order={order} onDelete={openDeleteModal} />
+              </motion.div>
             ))}
           </div>
         </section>

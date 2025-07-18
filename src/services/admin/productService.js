@@ -1,4 +1,4 @@
-import { getAllProductApi , createProductApi , deleteOneProductApi ,getProductsByCategoryApi} from "../../api/admin/productApi";
+import { getAllProductApi, createProductApi, deleteOneProductApi, getProductsByCategoryApi, getProductByIdApi , updateProductApi} from "../../api/admin/productApi";
 
 export const getAllProductService = async (params) => {
     try {
@@ -18,6 +18,9 @@ export const createProductService = async (data) => {
     }
 
 }
+
+export const updateProductService = (id, data) => updateProductApi(id, data);
+
 export const deleteProductService = async (id) => {
     try {
         const response = await deleteOneProductApi(id);
@@ -27,8 +30,18 @@ export const deleteProductService = async (id) => {
     }
 };
 
+
+export const getProductByIdService = async (id) => {
+    try {
+        const response = await getProductByIdApi(id)
+        return response.data.data
+    } catch (err) {
+        throw err.response?.data || { message: "Failed to fetch product" }
+    }
+}
+
 export const getProductsByCategoryService = async (categoryId) => {
-  const response = await getProductsByCategoryApi(categoryId)
-  // You can do additional processing here if needed
-  return response.data.data  // Return the actual product array
+    const response = await getProductsByCategoryApi(categoryId)
+
+    return response.data.data  // Return the actual product array
 }

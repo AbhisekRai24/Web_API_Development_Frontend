@@ -1,29 +1,5 @@
-// import { useMutation } from "@tanstack/react-query";
-// import { loginUserService } from "../services/authService";
-// import { toast } from "react-toastify";
-// import { useContext } from "react";
-// import { AuthContext } from "../auth/AuthProvider";
-// export const useLoginUser = () => {
-//     const { login } = useContext(AuthContext)
-
-//     return useMutation(
-//         {
-//             mutationFn: loginUserService,
-//             mutationKey: ["login_key"],
-//             onSuccess: (data) => { // data -> body
-//                 login(data?.data, data?.token)
-//                 toast.success(data?.message || "Login Success")
-//             },
-//             onError: (err) => {
-//                 toast.error(err?.message || "Login Failed")
-//             }
-//         }
-//     )
-// }
-
-// 
-import { useMutation } from "@tanstack/react-query";
-import { loginUserService } from "../services/authService";
+import {useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { loginUserService, updateUserService , getUserService } from "../services/authService";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import { AuthContext } from "../auth/AuthProvider";
@@ -36,31 +12,7 @@ export const useLoginUser = () => {
     return useMutation({
         mutationFn: loginUserService,
         mutationKey: ["login_key"],
-        // onSuccess: (data) => {
-        //     const user = data?.data;
-        //     const token = data?.token;
-        //     const role = user?.role;
 
-        //     console.log("Login success data:", data);
-        //     console.log("Extracted user:", user);
-        //     console.log("Extracted role:", role);
-
-        //     // Update context
-        //     login(user, token);
-
-        //     // Store in localStorage
-        //     localStorage.setItem("user", JSON.stringify(user));
-        //     localStorage.setItem("token", token);
-
-        //     toast.success(data?.message || "Login Success");
-
-        //     // Redirect based on role
-        //     if (role?.toLowerCase() === "admin") {
-        //         navigate("/admin/dashboard");
-        //     } else {
-        //         navigate("/normal/dash");
-        //     }
-        // },
         onSuccess: (data) => {
             const user = data?.data;
             const token = data?.token;
@@ -72,8 +24,6 @@ export const useLoginUser = () => {
             // ✅ Call login, which sets user + localStorage
             login(user, token);
 
-            // ❌ DO NOT manually call localStorage.setItem again
-            // It may override or race with the context
 
             toast.success(data?.message || "Login Success");
 
@@ -89,3 +39,28 @@ export const useLoginUser = () => {
         },
     });
 };
+
+export const useUser = (userId) => {
+  return useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => getUserService(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useUpdateUser = (userId) => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (formData) => updateUserService(userId, formData),
+        onSuccess: (data) => {
+            toast.success(data?.message || "Profile updated successfully")
+            // Invalidate user query to refresh updated data
+            queryClient.invalidateQueries(["user", userId])
+        },
+        onError: (error) => {
+            toast.error(error?.message || "Failed to update profile")
+        },
+    })
+}

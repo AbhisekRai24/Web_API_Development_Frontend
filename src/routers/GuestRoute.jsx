@@ -9,10 +9,10 @@ export default function GuestRoute() {
     if (loading) return <>Loading...</>;
 
     if (user) {
-        // ✅ Redirect based on role
+
         if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-        if (user.role === 'normal') return <Navigate to="/normal/dash" replace />;
-        return <Navigate to="/" replace />;
+        if (user.role === 'normal') return <Navigate to="/normal/home" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     return <Outlet />;

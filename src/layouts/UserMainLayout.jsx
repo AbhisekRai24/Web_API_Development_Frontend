@@ -6,7 +6,7 @@ import Sidebar from './MenuSideBar'
 
 export default function UserMainLayout() {
   return (
-    <div>
+    <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white transition-colors duration-300">
       <Header />
       <div className="flex">
         <Sidebar />
@@ -14,6 +14,12 @@ export default function UserMainLayout() {
           <Outlet />
         </main>
       </div>
+        <footer className="bg-[#A62123] text-white py-6 text-center">
+        <h2 className="text-lg font-semibold tracking-wide mb-2">Servzz</h2>
+        <p className="text-sm opacity-90">
+          © {new Date().getFullYear()} Servzz. All rights reserved. Unauthorized use or duplication is prohibited.
+        </p>
+      </footer>
     </div>
   )
 }

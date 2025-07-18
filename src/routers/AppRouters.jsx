@@ -1,6 +1,6 @@
 import { useContext } from "react"; // ✅ Required import
 import { AuthContext } from '../auth/AuthProvider';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from '../layouts/AdminMainLayout'
 import Login from '../pages/login_page'
 import Home from '../pages/home_page'
@@ -22,6 +22,11 @@ import Page from "../components/user_dashbard"
 import MyOrders from "../pages/MyOrders"
 import UserMainLayout from "../layouts/UserMainLayout"
 import CategoryProducts from "../components/CategoryProduct";
+import ProfilePage from "../components/ProfilePage";
+import Notifications from "../pages/Notifications";
+import UserHomePage from "../components/UserDashTEst";
+import ProductDetail from "../components/admin/product/ProductDetail";
+import EditProduct from "../components/admin/product/EditProduct";
 
 function App() {
     const { loading } = useContext(AuthContext);
@@ -32,26 +37,18 @@ function App() {
         <Router>
 
             <Routes>
-                <Route path="/" element={<Home />}></Route>
+                <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route element={<GuestRoute />}>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                 </Route>
 
-
-
-                {/* <Route path='/normal/*' element={<NormalUserRoute />}>
-
-                    <Route path='*' element={<>404 Not Found</>} ></Route>
-                    
-                </Route>
-
-                <Route element={<MainLayout />}>
-                    <Route path="" element={<Home />} />
-                    <Route path="/dash" element={<Page />} />
-
-
+                {/* <Route path="/normal/home" element={<UserMainLayout />}>
+                    <Route index element={<UserHomePage />} />
                 </Route> */}
+
+
+
 
                 {/* Normal user routes protected by NormalUserRoute */}
                 <Route path='/normal/*' element={<NormalUserRoute />}>
@@ -59,13 +56,18 @@ function App() {
                     <Route element={<UserMainLayout />}>
 
                         <Route path="dash" element={<Page />} />
+
+                        <Route path="home" element={<UserHomePage />} />
+
                         <Route path="myorders" element={<MyOrders />} />
+                        <Route path="profile" element={<ProfilePage />} />
+                        <Route path="notification" element={<Notifications />} />
                         <Route path="user/category/:categoryId" element={<CategoryProducts />} />
-             </Route>
+                    </Route>
                     {/* Catch all 404 for /normal */}
                     <Route path="*" element={<>404 Not Found</>} />
-                      </Route>
-              
+                </Route>
+
 
                 {/* Admin routes under AdminLayout */}
                 <Route path="/admin/*" element={<AdminLayout />}>
@@ -78,6 +80,10 @@ function App() {
                     <Route path="user" element={<UserManagement />} />
                     <Route path="user/create" element={<CreateUserForm />} />
                     <Route path="user/:id/edit" element={<UpdateUserForm />} />
+                    <Route path="products/:id" element={<ProductDetail />} />
+                    <Route path="products/:id/edit" element={<EditProduct />} />
+
+
                     <Route path='category/create' element={<CreateCategory />}></Route>
 
                 </Route>

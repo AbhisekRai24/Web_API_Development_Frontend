@@ -22,7 +22,6 @@ export default function OrderDetailsModal({ order, isOpen, onClose }) {
         className="fixed inset-0 z-50 overflow-y-auto"
         onClose={onClose}
       >
-        {/* Backdrop blur overlay */}
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -32,99 +31,128 @@ export default function OrderDetailsModal({ order, isOpen, onClose }) {
           leaveFrom="opacity-100 backdrop-blur-sm"
           leaveTo="opacity-0 backdrop-blur-none"
         >
-          <div className="fixed inset-0 bg-transparent backdrop-filter backdrop-blur-sm" aria-hidden="true" />
+          <div
+            className="fixed inset-0 bg-transparent backdrop-filter backdrop-blur-sm dark:backdrop-blur-md"
+            aria-hidden="true"
+          />
         </Transition.Child>
 
-        <div className="flex items-center justify-center min-h-screen p-4 text-center">
-          <span
-            className="inline-block h-screen align-middle"
-            aria-hidden="true"
-          >
+        <div className="flex items-center justify-center min-h-screen p-6 text-center">
+          <span className="inline-block h-screen align-middle" aria-hidden="true">
             &#8203;
           </span>
 
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
+            enterFrom="opacity-0 scale-90"
             enterTo="opacity-100 scale-100"
             leave="ease-in duration-200"
             leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+            leaveTo="opacity-0 scale-90"
           >
-            <Dialog.Panel className="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
+            <Dialog.Panel className="inline-block w-full max-w-4xl p-8 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-900 shadow-2xl dark:shadow-black rounded-lg max-h-[85vh] overflow-y-auto">
               {/* Header */}
-              <div className="flex justify-between items-center mb-6">
-                <Dialog.Title className="text-xl font-bold text-gray-900">
+              <div className="flex justify-between items-center mb-8">
+                <Dialog.Title className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
                   Order #{order._id.slice(-5)}
                 </Dialog.Title>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-700 transition"
+                  className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-700 transition"
                   aria-label="Close modal"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-7 h-7" />
                 </button>
               </div>
 
               {/* User & Date */}
-              <div className="mb-4 space-y-1">
-                <p className="text-gray-700">
+              <div className="mb-6 space-y-2 text-lg text-gray-800 dark:text-gray-300">
+                <p>
                   <strong>User:</strong> {order.userId?.username || "Unknown"}
                 </p>
-                <p className="text-gray-700">
+                <p>
                   <strong>Date:</strong> {new Date(order.date).toLocaleString()}
                 </p>
                 <span
-                  className={`inline-block mt-1 px-3 py-1 rounded-full text-sm font-semibold ${statusStyles[order.status]}`}
+                  className={`inline-block mt-1 px-4 py-2 rounded-full text-base font-semibold ${statusStyles[order.status]
+                    }`}
                 >
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </span>
               </div>
 
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-6 border-gray-300 dark:border-gray-700" />
 
               {/* Products list */}
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Items:</h3>
-                <ul className="divide-y divide-gray-200 max-h-60 overflow-y-auto">
+                <h3 className="font-semibold text-xl text-gray-900 dark:text-gray-100 mb-5">
+                  Items:
+                </h3>
+                <ul className="divide-y divide-gray-300 dark:divide-gray-700 max-h-[50vh] overflow-y-auto">
                   {order.products.map((item, idx) => (
                     <li
                       key={idx}
-                      className="flex justify-between items-center py-2"
+                      className="flex justify-between items-start py-4"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-start gap-5">
                         {item.productImage && (
                           <img
                             src={item.productImage}
                             alt={item.name}
-                            className="w-12 h-12 rounded-md object-cover"
+                            className="w-20 h-20 rounded-md object-cover border border-gray-300 dark:border-gray-600"
                           />
                         )}
-                        <span className="text-gray-800">
-                          {item.name} x {item.quantity}
-                        </span>
+                        <div>
+                          <div className="text-gray-900 dark:text-gray-100 font-semibold text-lg">
+                            {item.name} x {item.quantity}
+                          </div>
+
+                          {/* Show addons if available */}
+                          {item.addons && item.addons.length > 0 && (
+                            <ul className="ml-6 mt-2 text-base text-gray-700 dark:text-gray-400 list-disc space-y-1">
+                              {item.addons.map((addon, i) => (
+                                <li key={i} className="ml-2">
+                                  {addon.name} - Rs {formatCurrency(addon.price)}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
                       </div>
-                      <span className="font-semibold text-gray-900">
-                        Rs {formatCurrency(item.price * item.quantity)}
+
+                      <span className="font-semibold text-gray-900 dark:text-gray-100 text-lg whitespace-nowrap">
+                        Rs{" "}
+                        {formatCurrency(
+                          (item.price +
+                            (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0)) *
+                          item.quantity
+                        )}
                       </span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-6 border-gray-300 dark:border-gray-700" />
 
               {/* Total */}
-              <div className="text-right font-semibold text-lg text-gray-900">
-                Total: Rs {formatCurrency(order.total)}
+              <div className="text-right font-bold text-2xl text-gray-900 dark:text-gray-100">
+                Total: Rs{" "}
+                {formatCurrency(
+                  order.products.reduce((total, item) => {
+                    const addonsTotal =
+                      item.addons?.reduce((sum, a) => sum + a.price, 0) || 0;
+                    return total + (item.price + addonsTotal) * item.quantity;
+                  }, 0)
+                )}
               </div>
 
               {/* Footer Close Button */}
-              <div className="mt-6 flex justify-end">
+              <div className="mt-10 flex justify-end">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
+                  className="px-6 py-3 bg-gray-300 dark:bg-gray-700 rounded hover:bg-gray-400 dark:hover:bg-gray-600 transition text-lg font-semibold dark:text-gray-100"
                 >
                   Close
                 </button>

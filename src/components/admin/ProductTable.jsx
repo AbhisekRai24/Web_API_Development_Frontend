@@ -1,177 +1,221 @@
-import React, { useState } from 'react'
-import { useAdminProduct, useDeleteProduct } from '../../hooks/admin/useAdminProduct'
-import DeleteModal from '../DeleteModal';
+"use client"
 
-
-
+import React, { useState } from "react"
+import {
+  Package,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+} from "lucide-react"
+import {
+  useAdminProduct,
+  useDeleteProduct,
+} from "../../hooks/admin/useAdminProduct"
+import DeleteModal from "../DeleteModal"
+import {
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+  Skeleton,
+} from "@mui/material"
 
 export default function ProductTable() {
-    const { data, error, isPending, products, pageNumber,
-        setPageNumber, pagination, canNextPage, canPreviousPage,
-        pageSize, setPageSize, search, setSearch } = useAdminProduct()
-    const { mutate: deleteProduct, isLoading: isDeleting } = useDeleteProduct();
-    const [selectedProduct, setSelectedProduct] = useState(null); // product to delete
-    const [showModal, setShowModal] = useState(false); // modal visibility
+  const {
+    data,
+    error,
+    isPending,
+    products,
+    pageNumber,
+    setPageNumber,
+    pagination,
+    canNextPage,
+    canPreviousPage,
+    pageSize,
+    setPageSize,
+    search,
+    setSearch,
+  } = useAdminProduct()
 
-    if (error) return <div className="text-red-600 font-semibold">{error.message}</div>
+  const { mutate: deleteProduct, isLoading: isDeleting } = useDeleteProduct()
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [showModal, setShowModal] = useState(false)
 
+  const handleDeleteClick = (product) => {
+    setSelectedProduct(product)
+    setShowModal(true)
+  }
 
-
-    const handleDeleteClick = (product) => {
-        setSelectedProduct(product);
-        setShowModal(true);
-    };
-
-    const confirmDelete = () => {
-        if (selectedProduct) {
-            deleteProduct(selectedProduct._id);
-        }
-        setShowModal(false);
-        setSelectedProduct(null);
-    };
-
-    const handlePrev = () => {
-        if (canPreviousPage) {
-            setPageNumber((prev) => prev - 1)
-        }
+  const confirmDelete = () => {
+    if (selectedProduct) {
+      deleteProduct(selectedProduct._id)
     }
-    const handleNext = () => {
-        if (canNextPage) {
-            setPageNumber((prev) => prev + 1)
-        }
-    }
-    const handleSearch = (e) => {
-        setPageNumber(1) // reset page number
-        setSearch(e.target.value)
-    }
+    setShowModal(false)
+    setSelectedProduct(null)
+  }
 
-    return (
-        <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Product Table</h2>
+  const handlePrev = () => {
+    if (canPreviousPage) setPageNumber((prev) => prev - 1)
+  }
+  const handleNext = () => {
+    if (canNextPage) setPageNumber((prev) => prev + 1)
+  }
+  const handleSearch = (e) => {
+    setPageNumber(1)
+    setSearch(e.target.value)
+  }
 
-            {/* Controls */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-3 sm:space-y-0">
-                {/* Page Size Selector */}
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="pageSize" className="font-medium text-gray-700">
-                        Show
-                    </label>
-                    <select
-                        id="pageSize"
-                        value={pagination.limit}
-                        onChange={(e) => setPageSize(Number(e.target.value))}
-                        className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
-                        <option value={30}>30</option>
-                    </select>
-                </div>
-
-                {/* Search Input */}
-                <div className="flex items-center space-x-2 mx-auto ">
-                    <label htmlFor="search" className="font-medium text-gray-700">
-                        Search:
-                    </label>
-                    <input
-                        id="search"
-                        type="text"
-                        value={search}
-                        onChange={handleSearch}
-                        placeholder="Search products..."
-                        className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
+  return (
+    <div className="max-w-7xl mx-auto p-6 space-y-8 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 text-white rounded-lg shadow-xl p-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+              <Package className="h-8 w-8" />
             </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse rounded-lg overflow-hidden shadow-sm">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="text-left px-6 py-3 font-semibold text-gray-700 border-b border-gray-300">
-                                Name
-                            </th>
-                            <th className="text-left px-6 py-3 font-semibold text-gray-700 border-b border-gray-300">
-                                Price
-                            </th>
-                            <th className="text-left px-6 py-3 font-semibold text-gray-700 border-b border-gray-300">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map((row) => (
-                            <tr
-                                key={row._id}
-                                className="odd:bg-white even:bg-gray-50 hover:bg-blue-50 transition-colors"
-                            >
-                                <td className="px-6 py-4 border-b border-gray-200">{row.name}</td>
-                                <td className="px-6 py-4 border-b border-gray-200">Rs.{row.price.toFixed(2)}</td>
-                                <td className="px-6 py-4 border-b border-gray-200">
-                                    <button
-                                        onClick={() => handleDeleteClick(row)}
-                                        className="bg-gray-400 text-red-800 px-3 py-1 rounded hover:bg-red-500 hover:text-white transition"
-
-                                        disabled={isDeleting}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <DeleteModal
-    isOpen={showModal}
-    onClose={() => setShowModal(false)}
-    onConfirm={confirmDelete}
-    title="Delete Product"
-    description={`Are you sure you want to delete "${selectedProduct?.name}"?`}
-/>
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Product Management</h1>
+              <p className="text-blue-100 text-lg">Manage your inventory</p>
             </div>
-            {/* Pagination Controls */}
-            <div className="mt-6 flex justify-between items-center">
-                <button
-                    onClick={handlePrev}
-                    disabled={!canPreviousPage}
-                    className={`px-4 py-2 rounded-md font-medium transition ${canPreviousPage
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                >
-                    Back
-                </button>
-                <span className="text-gray-700 font-medium">
-                    Page {pagination.page} of {pagination.totalPages}
-                </span>
-                <button
-                    onClick={handleNext}
-                    disabled={!canNextPage}
-                    className={`px-4 py-2 rounded-md font-medium transition ${canNextPage
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                >
-                    Next
-                </button>
+          </div>
+          <div className="hidden md:flex items-center space-x-6 text-right">
+            <div>
+              <div className="text-2xl font-bold">{products.length}</div>
+              <div className="text-blue-100 text-sm">Total Products</div>
             </div>
+            <div>
+              <div className="text-2xl font-bold">{pagination.total || 0}</div>
+              <div className="text-blue-100 text-sm">All Items</div>
+            </div>
+          </div>
         </div>
-    )
-}
-{/*             
-            {
-                products.map((row )=>
-                    <>{row.name}</>
-                )
-            }
+      </div>
 
-            {data.message} {data.success}
-            {
-                data.data && data.data.map(
-                    (row) => 
-                        <>
-                            <p>{row.name}</p>
-                            <p>{row.price}</p>
-                        </>
-                    
-                )
-            } */}
+      {/* Controls and Table */}
+      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg shadow-xl p-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+          <div className="flex items-center space-x-4">
+            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Show:
+            </label>
+            <Select
+              value={pagination.limit}
+              onChange={(e) => setPageSize(Number(e.target.value))}
+              size="small"
+              sx={{ minWidth: 80, bgcolor: "background.paper", color: "text.primary" }}
+            >
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={30}>30</MenuItem>
+            </Select>
+            <span className="text-sm text-gray-500 dark:text-gray-400">entries</span>
+          </div>
+
+          <TextField
+            label="Search products"
+            variant="outlined"
+            size="small"
+            value={search}
+            onChange={handleSearch}
+            sx={{ maxWidth: 300 }}
+            InputProps={{
+              startAdornment: <Search className="mr-2 h-4 w-4 text-gray-500" />,
+            }}
+          />
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+          <table className="min-w-full border-collapse">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="text-left px-6 py-4 font-semibold text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-700">
+                  Name
+                </th>
+                <th className="text-left px-6 py-4 font-semibold text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-700">
+                  Price
+                </th>
+                <th className="text-right px-6 py-4 font-semibold text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-700">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {isPending
+                ? Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="px-6 py-4">
+                        <Skeleton variant="text" width={120} />
+                      </td>
+                      <td className="px-6 py-4">
+                        <Skeleton variant="text" width={80} />
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <Skeleton variant="rectangular" width={100} height={32} />
+                      </td>
+                    </tr>
+                  ))
+                : products.map((product) => (
+                    <tr
+                      key={product._id}
+                      className="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700"
+                    >
+                      <td className="px-6 py-4">{product.name}</td>
+                      <td className="px-6 py-4 font-mono font-semibold text-green-600">
+                        Rs. {product.price.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          startIcon={<Trash2 className="w-4 h-4" />}
+                          onClick={() => handleDeleteClick(product)}
+                          disabled={isDeleting}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="mt-8 flex justify-between items-center">
+          <Button
+            variant="outlined"
+            startIcon={<ChevronLeft />}
+            onClick={handlePrev}
+            disabled={!canPreviousPage}
+          >
+            Previous
+          </Button>
+          <span className="text-gray-700 dark:text-gray-100 font-medium">
+            Page {pagination.page} of {pagination.totalPages}
+          </span>
+          <Button
+            variant="outlined"
+            endIcon={<ChevronRight />}
+            onClick={handleNext}
+            disabled={!canNextPage}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Product"
+        description={`Are you sure you want to delete "${selectedProduct?.name}"?`}
+      />
+    </div>
+  )
+}

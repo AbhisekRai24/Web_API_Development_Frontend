@@ -1,134 +1,37 @@
-// import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from "react";
+import {
+    TextField,
+    Button,
+    MenuItem,
+    Typography,
+    Paper,
+    Grid,
+    IconButton,
+    Box,
+    InputLabel,
+    FormControl,
+    Select,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { Add, Delete } from "@mui/icons-material";
+import { AuthContext } from "../../auth/AuthProvider";
+import { useCreateProduct } from "../../hooks/admin/useAdminProduct";
+import { useAdminCategory } from "../../hooks/admin/useAdminCategory";
 
-// export default function AddProductForm() {
-//     const [formData, setFormData] = useState({
-//         category: '',
-//         itemName: '',
-//         description: '',
-//         price: '',
-//         image: null
-//     });
+const FormWrapper = styled(Paper)(({ theme }) => ({
 
-//     const handleChange = (e) => {
-//         const { name, value } = e.target;
-//         setFormData(prev => ({ ...prev, [name]: value }));
-//     };
-
-//     const handleImageChange = (e) => {
-//         setFormData(prev => ({ ...prev, image: e.target.files[0] }));
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         // Simulate API call
-//         console.log('Product submitted:', formData);
-//         // TODO: Add actual API integration logic
-//     };
-
-//     return (
-//         <div className="max-w-3xl mx-auto mt-10 bg-white shadow-md p-8 rounded-lg">
-//             <h2 className="text-2xl font-semibold mb-6 text-gray-800">Product Information</h2>
-//             <form onSubmit={handleSubmit} className="space-y-5">
-
-//                 <div>
-//                     <label className="block mb-1 font-medium text-left">Category *</label>
-//                     <select
-//                         name="category"
-//                         value={formData.category}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full border border-gray-300 px-3 py-2 rounded-md"
-//                     >
-//                         <option value="">Select a category</option>
-//                         <option value="Drinks">Drinks</option>
-//                         <option value="Snacks">Snacks</option>
-//                         <option value="Meals">Meals</option>
-//                     </select>
-//                 </div>
-
-//                 <div>
-//                     <label className="block mb-1 font-medium text-left" >Item Name *</label>
-//                     <input
-//                         type="text"
-//                         name="itemName"
-//                         value={formData.itemName}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full border border-gray-300 px-3 py-2 rounded-md"
-//                         placeholder="Enter item name"
-//                     />
-//                 </div>
-
-//                 <div>
-//                     <label className="block mb-1 font-medium text-left">Description *</label>
-//                     <textarea
-//                         name="description"
-//                         value={formData.description}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full border border-gray-300 px-3 py-2 rounded-md"
-//                         placeholder="Enter item description"
-//                         rows={3}
-//                     />
-//                 </div>
-
-//                 <div>
-//                     <label className="block mb-1 font-medium text-left">Price *</label>
-//                     <input
-//                         type="number"
-//                         name="price"
-//                         value={formData.price}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full border border-gray-300 px-3 py-2 rounded-md"
-//                         placeholder="0.00"
-//                         min="0"
-//                         step="0.01"
-//                     />
-//                 </div>
-
-//                 <div>
-//                     <label className="block mb-2 font-medium text-left">Product Image</label>
-//                     <input
-//                         type="file"
-//                         accept="image/png, image/jpeg, image/gif"
-//                         onChange={handleImageChange}
-//                         className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-//                                    file:rounded-md file:border-0 file:text-sm file:font-semibold
-//                                    file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-//                     />
-//                 </div>
-
-//                 <div className="flex justify-between">
-//                     <button
-//                         type="button"
-//                         onClick={() => setFormData({ category: '', itemName: '', description: '', price: '', image: null })}
-//                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-6 rounded"
-//                     >
-//                         Cancel
-//                     </button>
-//                     <button
-//                         type="submit"
-//                         className="bg-[#A62123] hover:bg-[#C14547] text-white font-medium py-2 px-6 rounded"
-//                     >
-//                         Confirm & Add Product
-//                     </button>
-//                 </div>
-//             </form>
-//         </div>
-//     );
-// }
-
-import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../../auth/AuthProvider'; // Adjust path as needed
-import { useCreateProduct } from '../../hooks/admin/useAdminProduct';
-import { useAdminCategory } from '../../hooks/admin/useAdminCategory';
-
+    padding: theme.spacing(4),
+    marginTop: theme.spacing(5),
+    maxWidth: "800px",
+    marginLeft: "auto",
+    marginRight: "auto",
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+}));
 
 export default function AddProductForm() {
     const { user } = useContext(AuthContext);
     const userId = user?._id;
-
     const { categories, isLoading: loadingCategories } = useAdminCategory();
     const { mutate: createProduct, isLoading: creating } = useCreateProduct();
 
@@ -138,13 +41,11 @@ export default function AddProductForm() {
         description: "",
         price: "",
         image: null,
+        addons: [{ name: "", price: "" }],
     });
+    const [previewUrl, setPreviewUrl] = useState(null);
     const [message, setMessage] = useState("");
 
-    // State to hold preview URL
-    const [previewUrl, setPreviewUrl] = useState(null);
-
-    // Update preview URL when image changes
     useEffect(() => {
         if (!formData.image) {
             setPreviewUrl(null);
@@ -152,8 +53,6 @@ export default function AddProductForm() {
         }
         const objectUrl = URL.createObjectURL(formData.image);
         setPreviewUrl(objectUrl);
-
-        // Cleanup when component unmounts or image changes
         return () => URL.revokeObjectURL(objectUrl);
     }, [formData.image]);
 
@@ -166,12 +65,37 @@ export default function AddProductForm() {
         setFormData((prev) => ({ ...prev, image: e.target.files[0] }));
     };
 
+    const handleAddonChange = (index, field, value) => {
+        const updatedAddons = [...formData.addons];
+        updatedAddons[index][field] = value;
+        setFormData((prev) => ({ ...prev, addons: updatedAddons }));
+    };
+
+    const addAddon = () => {
+        setFormData((prev) => ({
+            ...prev,
+            addons: [...prev.addons, { name: "", price: "" }],
+        }));
+    };
+
+    const removeAddon = (index) => {
+        setFormData((prev) => ({
+            ...prev,
+            addons: prev.addons.filter((_, i) => i !== index),
+        }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setMessage("");
 
         if (!userId) {
             setMessage("You must be logged in to add a product.");
+            return;
+        }
+
+        if (!formData.itemName || !formData.price || !formData.category) {
+            setMessage("Please fill required fields.");
             return;
         }
 
@@ -186,6 +110,13 @@ export default function AddProductForm() {
             data.append("productImage", formData.image);
         }
 
+        formData.addons.forEach((addon, index) => {
+            if (addon.name.trim()) {
+                data.append(`addons[${index}][name]`, addon.name);
+                data.append(`addons[${index}][price]`, addon.price || "0");
+            }
+        });
+
         createProduct(data, {
             onSuccess: () => {
                 setMessage("Product created successfully!");
@@ -195,7 +126,9 @@ export default function AddProductForm() {
                     description: "",
                     price: "",
                     image: null,
+                    addons: [{ name: "", price: "" }],
                 });
+                setPreviewUrl(null);
             },
             onError: (error) => {
                 setMessage(error?.message || "Failed to create product.");
@@ -204,143 +137,172 @@ export default function AddProductForm() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto mt-10 bg-white shadow-md p-8 rounded-lg">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-                Product Information
-            </h2>
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-5"
-                encType="multipart/form-data"
-            >
-                <div>
-                    <label className="block mb-1 font-medium text-left">Category *</label>
-                    <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        required
-                        className="w-full border border-gray-300 px-3 py-2 rounded-md"
-                    >
-                        <option value="">Select a category</option>
-                        {loadingCategories ? (
-                            <option disabled>Loading categories...</option>
-                        ) : (
-                            categories.map((cat) => (
-                                <option key={cat._id} value={cat._id}>
-                                    {cat.name}
-                                </option>
-                            ))
-                        )}
-                    </select>
-                </div>
+        <FormWrapper elevation={3} component="form" onSubmit={handleSubmit}>
+            <Typography variant="h4" gutterBottom>
+                Add New Product
+            </Typography>
 
-                <div>
-                    <label className="block mb-1 font-medium text-left">Item Name *</label>
-                    <input
-                        type="text"
-                        name="itemName"
-                        value={formData.itemName}
-                        onChange={handleChange}
-                        required
-                        className="w-full border border-gray-300 px-3 py-2 rounded-md"
-                        placeholder="Enter item name"
-                    />
-                </div>
+            <FormControl fullWidth margin="normal">
+                <InputLabel>Category *</InputLabel>
+                <Select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                    label="Category *"
+                >
+                    <MenuItem value="">
+                        <em>Select a category</em>
+                    </MenuItem>
+                    {loadingCategories ? (
+                        <MenuItem disabled>Loading...</MenuItem>
+                    ) : (
+                        categories.map((cat) => (
+                            <MenuItem key={cat._id} value={cat._id}>
+                                {cat.name}
+                            </MenuItem>
+                        ))
+                    )}
+                </Select>
+            </FormControl>
 
-                <div>
-                    <label className="block mb-1 font-medium text-left">Description *</label>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                        className="w-full border border-gray-300 px-3 py-2 rounded-md"
-                        placeholder="Enter item description"
-                        rows={3}
-                    />
-                </div>
+            <TextField
+                fullWidth
+                name="itemName"
+                label="Item Name *"
+                value={formData.itemName}
+                onChange={handleChange}
+                margin="normal"
+                required
+            />
 
-                <div>
-                    <label className="block mb-1 font-medium text-left">Price *</label>
-                    <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required
-                        className="w-full border border-gray-300 px-3 py-2 rounded-md"
-                        placeholder="0.00"
-                        min="0"
-                        step="0.01"
-                    />
-                </div>
+            <TextField
+                fullWidth
+                multiline
+                rows={3}
+                name="description"
+                label="Description *"
+                value={formData.description}
+                onChange={handleChange}
+                margin="normal"
+                required
+            />
 
-                <div>
-                    <label className="block mb-2 font-medium text-left">Product Image</label>
+            <TextField
+                fullWidth
+                type="number"
+                name="price"
+                label="Price *"
+                value={formData.price}
+                onChange={handleChange}
+                margin="normal"
+                required
+            />
+
+            <Box my={2}>
+                <Button variant="contained" component="label">
+                    Upload Product Image
                     <input
                         type="file"
-                        accept="image/png, image/jpeg, image/gif"
+                        hidden
+                        accept="image/*"
                         onChange={handleImageChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                       file:rounded-md file:border-0 file:text-sm file:font-semibold
-                       file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
-                </div>
-
-                {/* Image Preview */}
-                {previewUrl && (
-                    <div className="mt-4 text-center">
-                        <p className="text-gray-700 font-semibold mb-3">Image Preview:</p>
-                        <div className="inline-block border border-gray-300 shadow-md rounded-xl overflow-hidden transition-transform duration-300 hover:scale-105 mx-auto">
-                            <img
-                                src={previewUrl}
-                                alt="preview"
-                                className="w-64 h-64 object-cover"
-                            />
-                        </div>
-                        <p className="text-sm text-gray-500 mt-2">{formData.image?.name}</p>
-                    </div>
+                </Button>
+                {formData.image && (
+                    <Typography variant="body2" mt={1}>
+                        {formData.image.name}
+                    </Typography>
                 )}
+            </Box>
 
+            {previewUrl && (
+                <Box my={2}>
+                    <img
+                        src={previewUrl}
+                        alt="preview"
+                        style={{ width: 200, height: 200, objectFit: "cover", borderRadius: 8 }}
+                    />
+                </Box>
+            )}
 
-                {message && (
-                    <p
-                        className={`text-center ${message.includes("successfully")
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                    >
-                        {message}
-                    </p>
-                )}
+            <Typography variant="h6" mt={4}>
+                Add-ons (Optional)
+            </Typography>
 
-                <div className="flex justify-between">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setFormData({
-                                category: "",
-                                itemName: "",
-                                description: "",
-                                price: "",
-                                image: null,
-                            })
-                        }
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-6 rounded"
-                        disabled={creating}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="bg-[#A62123] hover:bg-[#C14547] text-white font-medium py-2 px-6 rounded"
-                        disabled={creating}
-                    >
-                        {creating ? "Adding..." : "Confirm & Add Product"}
-                    </button>
-                </div>
-            </form>
-        </div>
+            {formData.addons.map((addon, index) => (
+                <Grid container spacing={2} key={index} alignItems="center" mt={1}>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Add-on Name"
+                            value={addon.name}
+                            onChange={(e) => handleAddonChange(index, "name", e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <TextField
+                            fullWidth
+                            type="number"
+                            label="Price"
+                            value={addon.price}
+                            onChange={(e) => handleAddonChange(index, "price", e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={2}>
+                        {formData.addons.length > 1 && (
+                            <IconButton onClick={() => removeAddon(index)} color="error">
+                                <Delete />
+                            </IconButton>
+                        )}
+                    </Grid>
+                </Grid>
+            ))}
+
+            <Box mt={2}>
+                <Button startIcon={<Add />} onClick={addAddon}>
+                    Add another add-on
+                </Button>
+            </Box>
+
+            {message && (
+                <Typography
+                    color={message.includes("successfully") ? "success.main" : "error"}
+                    align="center"
+                    mt={2}
+                >
+                    {message}
+                </Typography>
+            )}
+
+            <Box display="flex" justifyContent="space-between" mt={4}>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => {
+                        setFormData({
+                            category: "",
+                            itemName: "",
+                            description: "",
+                            price: "",
+                            image: null,
+                            addons: [{ name: "", price: "" }],
+                        });
+                        setPreviewUrl(null);
+                    }}
+                    disabled={creating}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    disabled={creating}
+                >
+                    {creating ? "Adding..." : "Confirm & Add Product"}
+                </Button>
+            </Box>
+        </FormWrapper>
     );
 }
