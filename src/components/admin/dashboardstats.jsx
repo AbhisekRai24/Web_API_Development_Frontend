@@ -1,36 +1,77 @@
-import React from 'react';
-import ordersImg from '../../assets/images/total_order.jpg';
-import revenueImg from '../../assets/images/total_revenue.jpg';
-import servedImg from '../../assets/images/served.jpg';
-import pendingImg from '../../assets/images/pending.jpg';
-const stats = [
-  { title: "Total Orders Today", value: 127, bgImage: ordersImg },
-  { title: "Revenue Today", value: "Rs4000", bgImage: revenueImg },
-  { title: "Total Orders Served", value: "500", bgImage: servedImg },
-  { title: "Pending Orders", value: 8, bgImage: pendingImg },
-];
+import React, { useEffect, useState } from "react";
+import StatCard from "./StatCard";
+import ordersImg from "../../assets/images/total_order.jpg";
+import revenueImg from "../../assets/images/total_revenue.jpg";
+import servedImg from "../../assets/images/served.jpg";
+import pendingImg from "../../assets/images/pending.jpg";
+import { useFetchAllOrders } from "../../hooks/useCreateOrder";
 
-const DashboardStats = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {stats.map((item, idx) => (
-      <div
-        key={idx}
-        className="relative p-4 rounded shadow text-white h-40 flex flex-col justify-end"
-        style={{
-          backgroundImage: `url(${item.bgImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Overlay for better text visibility */}
-        <div className="absolute inset-0 bg-black bg-opacity-40 rounded"></div>
+const DashboardStats = () => {
+  const { data: orders = [], isLoading } = useFetchAllOrders();
 
-        {/* Content */}
-        <h3 className="relative text-sm font-semibold">{item.title}</h3>
-        <p className="relative text-2xl font-bold">{item.value}</p>
-      </div>
-    ))}
-  </div>
-);
+  const [completedTodayCount, setCompletedTodayCount] = useState(0);
+  const [revenueToday, setRevenueToday] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const [totalOrdersServed, setTotalOrdersServed] = useState(0);
+
+  useEffect(() => {
+    if (!orders.length) {
+      setCompletedTodayCount(0);
+      setRevenueToday(0);
+      setPendingOrdersCount(0);
+      setTotalOrdersServed(0);
+      return;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const completedTodayOrders = orders.filter((order) => {
+      if (order.status !== "completed") return false;
+      const orderDate = new Date(order.date);
+      orderDate.setHours(0, 0, 0, 0);
+      return orderDate.getTime() === today.getTime();
+    });
+
+    setCompletedTodayCount(completedTodayOrders.length);
+
+    const totalRevenue = completedTodayOrders.reduce(
+      (sum, order) => sum + (order.total || 0),
+      0
+    );
+    setRevenueToday(totalRevenue);
+
+    const pendingOrders = orders.filter(order => order.status === "pending");
+    setPendingOrdersCount(pendingOrders.length);
+
+    const totalServed = orders.filter(order => order.status === "completed").length;
+    setTotalOrdersServed(totalServed);
+  }, [orders]);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatCard
+        title="Total Orders Today"
+        value={isLoading ? "Loading..." : completedTodayCount}
+        bgImage={ordersImg}
+      // Add dark mode classes or pass a prop for dark styling if needed
+      />
+      <StatCard
+        title="Revenue Today"
+        value={isLoading ? "Loading..." : `Rs ${revenueToday.toLocaleString()}`}
+        bgImage={revenueImg}
+      />
+      <StatCard
+        title="Total Orders Served"
+        value={isLoading ? "Loading..." : totalOrdersServed}
+        bgImage={servedImg}
+      />
+      <StatCard
+        title="Pending Orders"
+        value={isLoading ? "Loading..." : pendingOrdersCount}
+        bgImage={pendingImg}
+      />
+    </div>
+  );
+};
 
 export default DashboardStats;

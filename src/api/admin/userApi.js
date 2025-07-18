@@ -17,11 +17,10 @@ export const getUserByIdApi = async (id) => {
   const res = await axios.get(`/admin/users/${id}`);
   return res.data; 
 };
-export const updateUserApi = async ({ id, data }) => {
-    const response = await axios.put(`/admin/users/${id}`, data);
-    return response.data;
+export const updateUserApi = async (id, data) => {
+  const response = await axios.put(`/admin/users/${id}`, data);
+  return response.data;
 };
-
 
 export const deleteUserApi = (id) => {
   const token = localStorage.getItem("token");

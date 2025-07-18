@@ -1,178 +1,229 @@
-// import React, { useState } from "react";
-// import { useAdminUser, useDeleteUser } from "../../hooks/admin/useAdminUser";
-// import DeleteModel from "../DeleteModel";
-// import { Link } from "react-router-dom";
+"use client"
 
-// export default function UserTable() {
-//     const { users, error, isLoading, isError } = useAdminUser();
-//     const [deleteId, setDeleteId] = useState(null);
-//     const deleteUserMutation = useDeleteUser();
+import React, { useState, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
+import {
+    Search as SearchIcon,
+    Plus,
+    Eye,
+    Edit,
+    Trash2,
+    Users,
+    AlertCircle,
+} from "lucide-react"
 
-//     const handleConfirmDelete = () => {
-//         deleteUserMutation.mutate(deleteId, {
-//             onSuccess: () => {
-//                 setDeleteId(null);
-//             },
-//             onError: (err) => {
-//                 alert(err.message || "Failed to delete user");
-//             },
-//         });
-//     };
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    IconButton,
+    TextField,
+    Typography,
+    Button as MuiButton,
+    Grid,
+    Card as MuiCard,
+    CardContent as MuiCardContent,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    CircularProgress,
+    Chip,
+    useTheme,
+} from "@mui/material"
 
-//     return (
-//         <div className="p-10 bg-gray-50 shadow-md rounded-xl">
-//             <div className="flex items-center justify-between mb-10">
-//                 <h2 className="text-2xl font-bold mb-6 text-gray-800">Users</h2>
-//                 <Link to="/admin/user/create">
-//                     <button className="bg-gray-600 text-white px-4 py-2 rounded-lg border border-green-500 hover:bg-blue-700 transition">
-//                         Add User
-//                     </button>
-//                 </Link>
-//             </div>
-
-//             {isLoading && <p className="text-gray-500">Loading users...</p>}
-//             {isError && <p className="text-red-500">Error: {error.message}</p>}
-
-//             <div className="overflow-x-auto">
-//                 <table className="min-w-full bg-white rounded-lg shadow">
-//                     <thead>
-//                         <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-//                             <th className="py-3 px-6 text-left">Name</th>
-//                             <th className="py-3 px-6 text-left">Email</th>
-//                             <th className="py-3 px-6 text-left">Role</th>
-//                             <th className="py-3 px-6 text-center">Actions</th>
-//                         </tr>
-//                     </thead>
-//                     <tbody className="text-gray-600 text-sm font-light">
-//                         {users.length === 0 && (
-//                             <tr>
-//                                 <td colSpan={4} className="text-center py-4">
-//                                     No users found.
-//                                 </td>
-//                             </tr>
-//                         )}
-//                         {users.map((user) => (
-//                             <tr key={user._id} className="border-b border-gray-200 hover:bg-gray-100">
-//                                 <td className="py-3 px-6 text-left whitespace-nowrap font-semibold text-black">
-//                                     {user.username}
-//                                 </td>                                <td className="py-3 px-6 text-left font-semibold text-black">{user.email}</td>
-//                                 <td className="py-3 px-6 text-left">{user.role}</td>
-//                                 <td className="py-3 px-6 text-center">
-//                                     <div className="flex item-center justify-center gap-4">
-//                                         <Link to={`/admin/user/${user._id}`} className="text-blue-600 hover:underline">
-//                                             View
-//                                         </Link>
-//                                         <Link to={`/admin/user/${user._id}/edit`} className="text-green-600 hover:underline">
-//                                             Edit
-//                                         </Link>
-//                                         <button
-//                                             onClick={() => setDeleteId(user._id)}
-//                                             className="text-red-600 hover:underline"
-//                                             disabled={deleteUserMutation.isLoading}
-//                                         >
-//                                             {deleteUserMutation.isLoading && deleteId === user._id ? "Deleting..." : "Delete"}
-//                                         </button>
-//                                     </div>
-//                                 </td>
-//                             </tr>
-//                         ))}
-//                     </tbody>
-//                 </table>
-//             </div>
-
-//             {/* Delete Modal */}
-//             {deleteId && (
-//                 <DeleteModel
-//                     onClose={() => setDeleteId(null)}
-//                     onConfirm={handleConfirmDelete}
-//                     message="Are you sure you want to delete this user?"
-//                 />
-//             )}
-//         </div>
-//     );
-// }
-import React, { useState } from "react";
-import { useAdminUser, useDeleteUser } from "../../hooks/admin/useAdminUser";
-import DeleteModel from "../DeleteModel";
-import { Link } from "react-router-dom";
+import { useAdminUser, useDeleteUser } from "../../hooks/admin/useAdminUser"
 
 export default function UserTable() {
-    const { users, error, isLoading, isError } = useAdminUser();
-    const [deleteId, setDeleteId] = useState(null);
-    const deleteUserMutation = useDeleteUser();
+    const { users = [], isLoading } = useAdminUser()
+    const deleteUserMutation = useDeleteUser()
+    const [deleteId, setDeleteId] = useState(null)
+    const [searchTerm, setSearchTerm] = useState("")
+    const navigate = useNavigate()
+    const theme = useTheme()
+
+    const filteredUsers = useMemo(() => {
+        return users.filter(
+            (user) =>
+                user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.role.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [users, searchTerm])
 
     const handleConfirmDelete = () => {
         deleteUserMutation.mutate(deleteId, {
-            onSuccess: () => {
-                setDeleteId(null);
-            },
-            onError: (err) => {
-                alert(err.message || "Failed to delete user");
-            },
-        });
-    };
+            onSuccess: () => setDeleteId(null),
+            onError: (err) => alert(err.message || "Failed to delete user"),
+        })
+    }
+
+    const getRoleColor = (role) => {
+        switch (role) {
+            case "admin":
+                return "error"
+            case "moderator":
+                return "secondary"
+            default:
+                return "default"
+        }
+    }
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "active":
+                return "success"
+            case "inactive":
+                return "secondary"
+            case "pending":
+                return "default"
+            default:
+                return "default"
+        }
+    }
 
     return (
-        <div className="p-6 bg-gray-50 shadow-md rounded-xl">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Users</h2>
-                <Link to="/admin/user/create">
-                    <button className="bg-[#A62123] text-white px-4 py-2 rounded-md hover:bg-red-500 transition">
+        <div style={{ padding: "24px" }}>
+            <Grid container justifyContent="space-between" alignItems="center" mb={4}>
+                <Grid item>
+                    <Typography variant="h4" display="flex" alignItems="center" gap={1}>
+                        <Users size={28} /> User Management
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Manage and monitor user accounts across your platform
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <MuiButton
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Plus />}
+                        onClick={() => navigate("/admin/user/create")}
+                    >
                         Add User
-                    </button>
-                </Link>
-            </div>
+                    </MuiButton>
+                </Grid>
+            </Grid>
 
-            {isLoading && <p className="text-gray-500">Loading users...</p>}
-            {isError && <p className="text-red-500">Error: {error.message}</p>}
+            {/* Stats Cards */}
+            <Grid container spacing={2} mb={4}>
+                {[
+                    { label: "Total Users", value: users.length },
+                    { label: "Active", value: users.filter((u) => u.status === "active").length },
+                    { label: "Pending", value: users.filter((u) => u.status === "pending").length },
+                    { label: "Admins", value: users.filter((u) => u.role === "admin").length },
+                ].map((stat, index) => (
+                    <Grid item xs={12} sm={6} md={3} key={index}>
+                        <MuiCard>
+                            <MuiCardContent>
+                                <Typography variant="body2">{stat.label}</Typography>
+                                <Typography variant="h6">{stat.value}</Typography>
+                            </MuiCardContent>
+                        </MuiCard>
+                    </Grid>
+                ))}
+            </Grid>
 
-            {users.length === 0 ? (
-                <p className="text-center text-gray-500">No users found.</p>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
-                    {users.map((user) => (
-                        <div key={user._id} className="bg-gray-500 p-5 rounded-xl shadow hover:shadow-lg transition">
-                            <div className="mb-2">
-                                <h3 className="text-lg font-semibold text-white">{user.username}</h3>
-                                <p className="text-sm font-medium text-white">{user.email}</p>
-                                <p className="text-sm text-gray-500">Role: {user.role}</p>
-                            </div>
-                            <div className="flex justify-between mt-4 text-sm">
-                                <Link
-                                    to={`/admin/user/${user._id}`}
-                                    className="bg-white text-blue-600 px-3 py-1 rounded-md text-center font-medium hover:bg-blue-50 transition hover:scale-105 transform transition-transform duration-200"
-                                >
-                                    View
-                                </Link>
-                                <Link
-                                    to={`/admin/user/${user._id}/edit`}
-                                    className="bg-white text-green-600 px-3 py-1 rounded-md font-medium hover:bg-green-50 transition hover:scale-105 transform transition-transform duration-200"
-                                >
-                                    Edit
-                                </Link>
-                                <button
-                                    onClick={() => setDeleteId(user._id)}
-                                    className="text-red-600 hover:scale-105 transform transition-transform duration-200 "
-                                    disabled={deleteUserMutation.isLoading}
-                                >
-                                    {deleteUserMutation.isLoading && deleteId === user._id
-                                        ? "Deleting..."
-                                        : "Delete"}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+            {/* Search Field */}
+            <TextField
+                variant="outlined"
+                size="small"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                fullWidth
+                InputProps={{
+                    startAdornment: <SearchIcon size={16} style={{ marginRight: 8 }} />,
+                }}
+                sx={{ mb: 3 }}
+            />
 
-            {/* Delete Modal */}
-            {deleteId && (
-                <DeleteModel
-                    onClose={() => setDeleteId(null)}
-                    onConfirm={handleConfirmDelete}
-                    message="Are you sure you want to delete this user?"
-                />
-            )}
+            {/* Table */}
+            <TableContainer component={Paper} sx={{ bgcolor: theme.palette.background.paper }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>User</strong></TableCell>
+                            <TableCell><strong>Role</strong></TableCell>
+                            <TableCell><strong>Status</strong></TableCell>
+                            <TableCell><strong>Created</strong></TableCell>
+                            <TableCell align="right"><strong>Actions</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredUsers.map((user) => (
+                            <TableRow key={user._id}>
+                                <TableCell>
+                                    <Typography fontWeight={500}>{user.username}</Typography>
+                                    <Typography variant="body2" color="text.secondary">{user.email}</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Chip label={user.role} color={getRoleColor(user.role)} size="small" />
+                                </TableCell>
+                                <TableCell>
+                                    <Chip label={user.status} color={getStatusColor(user.status)} size="small" />
+                                </TableCell>
+                                <TableCell>
+                                    {new Date(user.createdAt).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell align="right">
+                                    <IconButton onClick={() => navigate(`/admin/user/${user._id}`)}><Eye size={18} /></IconButton>
+                                    <IconButton onClick={() => navigate(`/admin/user/${user._id}/edit`)}><Edit size={18} /></IconButton>
+                                    <IconButton
+                                        onClick={() => setDeleteId(user._id)}
+                                        disabled={deleteUserMutation.isLoading && deleteId === user._id}
+                                    >
+                                        {deleteUserMutation.isLoading && deleteId === user._id
+                                            ? <CircularProgress size={18} />
+                                            : <Trash2 size={18} />}
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        {filteredUsers.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={5}>
+                                    <Typography align="center" color="text.secondary">No users found</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)}>
+                <DialogTitle>
+                    <AlertCircle style={{ color: "red", marginRight: 8 }} /> Confirm Deletion
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this user? This action is permanent.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <MuiButton onClick={() => setDeleteId(null)}>Cancel</MuiButton>
+                    <MuiButton
+                        color="error"
+                        onClick={handleConfirmDelete}
+                        disabled={deleteUserMutation.isLoading}
+                        startIcon={
+                            deleteUserMutation.isLoading ? (
+                                <CircularProgress size={16} />
+                            ) : (
+                                <Trash2 size={16} />
+                            )
+                        }
+                    >
+                        {deleteUserMutation.isLoading ? "Deleting..." : "Delete"}
+                    </MuiButton>
+                </DialogActions>
+            </Dialog>
         </div>
-    );
+    )
 }

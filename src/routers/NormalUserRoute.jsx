@@ -11,7 +11,7 @@ export default function NormalUserRoute() {
 
     if (!user) return <Navigate to="/login" replace />
 
-    if (user.role !== "normal") return <Navigate to="/" replace />
+    if (user.role !== "normal") return <Navigate to="/login" replace />
 
     return <Outlet />
 }
