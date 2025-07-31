@@ -1,4 +1,4 @@
-import {createUserApi, getAllUserApi, deleteUserApi, updateUserApi , getUserByIdApi} from "../../api/admin/userApi";
+import {createUserApi, getAllUserApi, deleteUserApi, updateUserApi , getUserByIdApi } from "../../api/admin/userApi";
 
 
 export const createUserService = async (formData) => {

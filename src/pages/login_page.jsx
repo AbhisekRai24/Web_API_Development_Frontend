@@ -15,7 +15,7 @@ export default function Login() {
             {/* Right Form Side */}
             <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-6">
                 <div className="w-full max-w-lg">
-                    <h2 className="text-3xl font-bold mb-6 text-center">Welcome Admin</h2>
+                    <h2 className="text-3xl font-bold mb-6 text-center">Welcome</h2>
                     <LoginForm />
                 </div>
             </div>

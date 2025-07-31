@@ -1,4 +1,12 @@
-import { loginUserApi, registerUserApi , getUserByIdApi , updateUserApi} from "../api/authApi";
+import { loginUserApi, registerUserApi , getUserByIdApi , updateUserApi, requestResetApi, resetPasswordApi} from "../api/authApi";
+
+export const requestResetService = async (email) => {
+  return await requestResetApi({ email });
+};
+
+export const resetPasswordService = async (token, password) => {
+  return await resetPasswordApi(token, { password });
+};
 
 export const registerUserService = async (formData) => {
     try {
