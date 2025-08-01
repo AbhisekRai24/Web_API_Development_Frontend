@@ -1,9 +1,41 @@
-import {useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { loginUserService, updateUserService , getUserService } from "../services/authService";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { loginUserService, updateUserService, getUserService, requestResetService , resetPasswordService} from "../services/authService";
 import { toast } from "react-toastify";
-import { useContext } from "react";
+import { useContext , useState  } from "react";
 import { AuthContext } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+
+
+export const useResetPassword = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const requestReset = async (email) => {
+        setLoading(true);
+        try {
+            const res = await requestResetService(email);
+            return res.data;
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const resetPassword = async (token, password) => {
+        setLoading(true);
+        try {
+            const res = await resetPasswordService(token, password);
+            return res.data;
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { loading, error, requestReset, resetPassword };
+};
 
 export const useLoginUser = () => {
     const { login } = useContext(AuthContext);
@@ -41,12 +73,12 @@ export const useLoginUser = () => {
 };
 
 export const useUser = (userId) => {
-  return useQuery({
-    queryKey: ["user", userId],
-    queryFn: () => getUserService(userId),
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
-  });
+    return useQuery({
+        queryKey: ["user", userId],
+        queryFn: () => getUserService(userId),
+        enabled: !!userId,
+        staleTime: 5 * 60 * 1000,
+    });
 };
 
 export const useUpdateUser = (userId) => {

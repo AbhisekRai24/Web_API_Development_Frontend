@@ -25,8 +25,11 @@ import CategoryProducts from "../components/CategoryProduct";
 import ProfilePage from "../components/ProfilePage";
 import Notifications from "../pages/Notifications";
 import UserHomePage from "../components/UserDashTEst";
+import BannerForm from "../components/admin/product/BannerManagement";
 import ProductDetail from "../components/admin/product/ProductDetail";
 import EditProduct from "../components/admin/product/EditProduct";
+import ResetPassword from "../components/auth/ResetPassword";
+import RequestReset from "../components/auth/RequestReset";
 
 function App() {
     const { loading } = useContext(AuthContext);
@@ -41,6 +44,8 @@ function App() {
                 <Route element={<GuestRoute />}>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/reset-password/:token" element={<ResetPassword />} />
+                    <Route path="/request-reset" element={<RequestReset />} />
                 </Route>
 
                 {/* <Route path="/normal/home" element={<UserMainLayout />}>
@@ -81,7 +86,9 @@ function App() {
                     <Route path="user/create" element={<CreateUserForm />} />
                     <Route path="user/:id/edit" element={<UpdateUserForm />} />
                     <Route path="products/:id" element={<ProductDetail />} />
+                    <Route path="banner/create" element={<BannerForm />} />
                     <Route path="products/:id/edit" element={<EditProduct />} />
+
 
 
                     <Route path='category/create' element={<CreateCategory />}></Route>

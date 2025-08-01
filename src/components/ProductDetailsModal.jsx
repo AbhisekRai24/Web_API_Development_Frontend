@@ -5,6 +5,8 @@ import { getBackendImageUrl } from '../utils/backend-image'
 export default function ProductDetailsModal({ product, onClose, onAddToCart }) {
     const [quantity, setQuantity] = useState(1)
     const [addons, setAddons] = useState([])
+    const imageUrl = getBackendImageUrl(product.productImage);
+    console.log("Product image URL:", imageUrl);
 
     useEffect(() => {
         setAddons(
@@ -94,11 +96,12 @@ export default function ProductDetailsModal({ product, onClose, onAddToCart }) {
                 <div className="flex-shrink-0 w-full md:w-1/2 bg-gray-100 dark:bg-gray-700 flex items-center justify-center p-6 overflow-hidden">
                     <div className="relative w-full h-[400px] md:h-[600px] rounded-md overflow-hidden bg-white dark:bg-gray-800 shadow">
                         <img
-                            src={getBackendImageUrl(product.productImage)}
+                            src={imageUrl}
                             alt={product.name}
                             className="w-full h-full object-cover"
                             loading="lazy"
                         />
+
                     </div>
                 </div>
 

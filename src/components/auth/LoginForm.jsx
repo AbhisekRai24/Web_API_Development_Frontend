@@ -74,6 +74,12 @@ export default function LoginForm() {
                 {isPending && (
                     <p className="text-blue-600 text-sm mt-2">Logging in...</p>
                 )}
+                <p className="text-sm mt-2 text-center">
+                    Forgot your password?{' '}
+                    <Link to="/request-reset" className="text-blue-600 hover:underline">
+                        Reset it here
+                    </Link>
+                </p>
             </div>
 
             {error && (

@@ -9,6 +9,7 @@ import {
     FaCog,
     FaPlusSquare,
     FaOptinMonster,
+    FaImage,
 } from "react-icons/fa";
 
 export default function AdminLayout() {
@@ -56,6 +57,12 @@ export default function AdminLayout() {
                             to="/admin/category"
                             active={isActive("/admin/category")}
                         />
+                        <SidebarItem
+                            icon={< FaImage />}   // You can import this or use any icon you prefer
+                            label="Banner"
+                            to="/admin/banner/create"
+                            active={isActive("/admin/banner/create")}
+                        />
                     </nav>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-10">Servzz Admin Panel</p>
                 </aside>
@@ -82,10 +89,9 @@ const SidebarItem = ({ icon, label, to = "#", active }) => (
     <Link to={to} className="block rounded md">
         <div
             className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all
-                ${
-                    active
-                        ? "bg-[#A62123] text-white font-semibold"
-                        : "text-gray-700 dark:text-gray-300 hover:text-[#A62123] hover:bg-gray-100 dark:hover:bg-gray-700"
+                ${active
+                    ? "bg-[#A62123] text-white font-semibold"
+                    : "text-gray-700 dark:text-gray-300 hover:text-[#A62123] hover:bg-gray-100 dark:hover:bg-gray-700"
                 }
             `}
         >

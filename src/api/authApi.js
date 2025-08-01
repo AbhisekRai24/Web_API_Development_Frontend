@@ -1,5 +1,13 @@
 import axios from "./api"
 
+
+
+export const requestResetApi = (data) => axios.post("/auth/request-reset", data);
+
+// Submit new password
+export const resetPasswordApi = (token, data) =>
+  axios.post(`/auth/reset-password/${token}`, data);
+
 export const registerUserApi = (formData) =>
   axios.post("/auth/register", formData, {
     headers: {
@@ -14,6 +22,6 @@ export const getUserByIdApi = (id) =>
 
 // UPDATE user info (with FormData for image upload)
 export const updateUserApi = (id, formData) =>
-  axios.put(`/admin/users/${id}`, formData, {
+  axios.put(`/auth/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }).then(res => res.data)
